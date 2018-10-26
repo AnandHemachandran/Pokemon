@@ -1,7 +1,7 @@
 var api_Link="https://pokeapi.co/api/v2";
 var search_req = new XMLHttpRequest();
-var type_req = new XMLHttpRequest();
-var poke_req=new XMLHttpRequest();
+var type_req= new XMLHttpRequest();
+
 
 
 
@@ -60,30 +60,39 @@ function weak_Against(){
 
   var type = document.getElementById("Weaktype").value;
   type_req.open('GET', "https://pokeapi.co/api/v2/type/"+type.toLowerCase()+'/',true)
-
+  var weakList= "";
   type_req.onload = function (){
                             var typeData=JSON.parse(this.responseText);
                             console.log(typeData);
 
                             var z=typeData.damage_relations.double_damage_from.length;
                             var k;
-                            for(k=0; k<z; k++){
 
-                              poke_req.open('GET', "https://pokeapi.co/api/v2/type/" + typeData.damage_relations.double_damage_from[k].name + '/',true);
-                              poke_req.onload = function(){
-                      			                               var pokeData = JSON.parse(this.responseText);
-                                                           console.log(pokeData);
+                            for(k=0; k<z; k++){
+                              var poke_req=new Array(k)
+                              poke_req[k]=new XMLHttpRequest();
+
+                              poke_req[k].open('GET', "https://pokeapi.co/api/v2/type/" + typeData.damage_relations.double_damage_from[k].name + '/',true);
+                              var strong_type=typeData.damage_relations.double_damage_from[k].name
+                              console.log(strong_type)
+                              console.log(poke_req)
+                              poke_req[k].onload = function(){
+                                                          var pokeData=new Array(k);
+                      			                              pokeData[k] = JSON.parse(this.responseText);
+                                                           console.log(pokeData[k]);
                       			                               var l;
-                                                           var weakList= "";
-                      			                               for(l=0; l<pokeData.pokemon.length; l++){
-                                                                weakList+= '<li class="m=3 list-group-item list-group-item-secondary ">' + pokeData.pokemon[l].pokemon.name + '</li>';
+
+                      			                               for(l=0; l<pokeData[k].pokemon.length; l++){
+                                                                weakList+= '<li class="m-1 rounded list-group-item list-group-item-secondary "><div class="row"><div class="col-10 p-1"><h4>'+ pokeData[k].pokemon[l].pokemon.name.toUpperCase()+'</h1></div>' +'<div class="col-2 p-2">'+pokeData[k].name+'</div></div></li>';
+                                                                console.log(weakList)
                                                             }
 
                                                             document.getElementById("weakness").innerHTML = "Pokemons strong against "+type+" are: <br><br>" + weakList;
                                                             }
 
-                      		                      }
-                      		   poke_req.send();
+
+                      		   poke_req[k].send();
+                           }
                       		   }
 
     type_req.send();
